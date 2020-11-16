@@ -8,6 +8,7 @@ type ChannelEntry = {
 declare interface Indexer {
   has(partyA: Public, partyB: Public): Promise<boolean>
   get(query?: { partyA?: Public; partyB?: Public }): Promise<ChannelEntry[]>
+  getChannelsFromPeer(p: PeerId): Promise<ChannelEntry[]>
 }
 
 export { ChannelEntry }

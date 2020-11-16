@@ -491,7 +491,7 @@ class Hopr<Chain extends HoprCoreConnector> extends EventEmitter {
       let chans = await this.paymentChannels.indexer.get({ partyA: toPub(p) })
       let cout = []
       for (let c of chans) {
-        cout.push([await pubKeyToPeerId(c.partyA), await pubKeyToPeerId(c.partyB), 0])
+        cout.push([p, await pubKeyToPeerId(c.partyB), 0])
       }
       return cout
     }

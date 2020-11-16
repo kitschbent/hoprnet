@@ -17,7 +17,7 @@ type LightEvent<E extends ContractEventLog<any>> = Pick<
   E,
   'event' | 'blockNumber' | 'transactionHash' | 'transactionIndex' | 'logIndex' | 'returnValues'
 >
-type Channel = { partyA: Public; partyB: Public; channelEntry: ChannelEntry }
+type Channel = { partyA: Public; partyB: Public; channelEntry: ChannelEntry; stake: BN}
 export type OpenedChannelEvent = LightEvent<ContractEventLog<{ opener: Public; counterparty: Public }>>
 export type ClosedChannelEvent = LightEvent<
   ContractEventLog<{ closer: Public; counterparty: Public; partyAAmount?: BN; partyBAmount?: BN }>
@@ -206,6 +206,16 @@ class Indexer implements IIndexer {
       // only one of the parties provided, get all open channels of party
       return this.getAll(query.partyA != null ? query.partyA : query.partyB, filter)
     }
+  }
+
+  public async getChannelsFromPeer(peer: PeerId): Promise<(PeerId, BN)[]> {
+    let toPub = (p: PeerId) => new this.paymentChannels.types.Public(p.pubKey.marshal())
+    let channels = await this.get({ partyA: toPub(p) })
+    let cout = []
+    for (let c of channels) {
+      cout.push([p, await pubKeyToPeerId(c.partyB), 0])
+    }
+    return cout
   }
 
   private async store(partyA: Public, partyB: Public, channelEntry: ChannelEntry): Promise<void> {
